@@ -17,4 +17,8 @@ HN-Sonar can...
 
 Requires Python 3 and Beautiful Soup 4. If you have pip, you can install Beautiful Soup by running `pip install beautifulsoup4`. Run it as `while true; do python hn-sonar.py <your-hn-username> | mail; sleep 10; done;` to check every 10 seconds and recieve a mail message when someone responds to your comment.
 
+### Example email
+
+Reply to comment: http://news.ycombinator.com/item?id=xyz
+
 *Important:* hn-sonar only checks the first page for comments, so if the delay is too long a reply may go off the page and hn-sonar will not see it. This will be fixed in future versions. Also, ensure that the directory where hn-sonar is being run in is writable, as hn-sonar uses a database to know which replies have been emailed.

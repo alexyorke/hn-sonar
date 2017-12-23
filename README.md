@@ -5,20 +5,17 @@ HN-Sonar can...
 
 - be self-hosted so there are no privacy concerns with sharing your email address with another company/website. hn-sonar can still be centralized, and still does not need your email.
 
-- be efficient with API requests so that you recieve notifications almost instantly by creating a tree-based cache on disk
+- is able to find the latest replies even if hn-sonar is not running all of the time. Use the `--continue` flag to search through all of the comments that were missed while hn-sonar was not running and check for replies. This allows you to batch replies into a single daily email by running hn-sonar daily. The continue option works even if the last comment that was seen was deleted, and it won't go into an infinite loop.
 
-- is able to find the latest replies even if hn-sonar is not running all of the time*
+- be used to detect if the author edited their comment after submission, or deleted it*.
 
-- be used to detect if the author edited their comment after submission, or deleted it*
-
-* feature not implemented yet.
 
 ## Usage
 
-Requires Python 3 and Beautiful Soup 4. If you have pip, you can install Beautiful Soup by running `pip install beautifulsoup4`. Run it as `while true; do python hn-sonar.py <your-hn-username> | mail; sleep 10; done;` to check every 10 seconds and recieve a mail message when someone responds to your comment.
+Requires Python 3 and Beautiful Soup 4. If you have pip, you can install Beautiful Soup by running `pip install beautifulsoup4`. Run it as `while true; do python hn-sonar.py <your-hn-username> | mail; sleep 10; done;` to check every 10 seconds and recieve a mail message when someone responds to your comment. If you don't want to have hn-sonar running every 10 seconds (and there is a chance that hn-sonar will not be running all of the time) you can use the `--continue` flag which will check previous pages for comments. hn-sonar will use the last comment id to find where it left off from, so this flag cannot be used when you start hn-sonar for the first time. The continue option can be invoked with `python hn-sonar.py <your-hn-username> --continue`.
 
 ### Example email
 
 Reply to comment: http://news.ycombinator.com/item?id=xyz
 
-*Important:* hn-sonar only checks the first page for comments, so if the delay is too long a reply may go off the page and hn-sonar will not see it. This will be fixed in future versions. Also, ensure that the directory where hn-sonar is being run in is writable, as hn-sonar uses a database to know which replies have been emailed.
+*Important:* ensure that the directory where hn-sonar is being run in is writable, as hn-sonar uses a database to know which replies have been emailed.

@@ -14,7 +14,13 @@ HN-Sonar can...
 
 ## Usage
 
-Requires Python 3 and Beautiful Soup 4. If you have pip, you can install Beautiful Soup by running `pip install beautifulsoup4`. Run it as `while true; do python hn-sonar.py <your-hn-username> | mail; sleep 10; done;` to check every 10 seconds and recieve a mail message when someone responds to your comment. If you don't want to have hn-sonar running every 10 seconds (and there is a chance that hn-sonar will not be running all of the time) you can use the `--continue` flag which will check previous pages for comments. hn-sonar will use the last comment id to find where it left off from, so this flag cannot be used when you start hn-sonar for the first time. The continue option can be invoked with `python hn-sonar.py <your-hn-username> --continue`.
+Requires Python 3 and Beautiful Soup 4.
+
+If you have pip, you can install Beautiful Soup by running `pip install beautifulsoup4`.
+
+Grab hn-sonar.py: `wget https://raw.githubusercontent.com/Decagon/hn-sonar/master/hn-sonar.py`
+
+Run it as `while true; do python hn-sonar.py <your-hn-username> --continue | mail; sleep 1m; done;` to check every minute and recieve an email when someone responds to your comment. Don't worry--the `--continue` flag will keep track of which comments it hasn't seen yet, so feel free to stop or start hn-sonar however often you please.
 
 ### Example email
 

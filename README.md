@@ -1,6 +1,8 @@
 # hn-sonar
 Automatically be notified if someone replies to your comment on Hacker News. No email required. Wait! This one is different than the others (I know, that's what they all say.)
 
+hn-sonar is a decentralized and self-hosted app which lets you know if someone responds to your HN comment or post. Notifications can be batched in any interval you desire, simply by running hn-sonar whenever you would like to check for new comments. It keeps track of which comments it has already seen, and will catch up by checking older comments to see if those have received new replies, so that you don't miss anything. 
+
 HN-Sonar can...
 
 - be self-hosted so there are no privacy concerns with sharing your email address with another company/website. hn-sonar can still be centralized, and still does not need your email.

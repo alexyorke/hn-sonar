@@ -60,7 +60,7 @@ while True:
             if (parentId in usedIds):
                 continue
 
-            if int(nextPageId) < int(lastId):
+            if int(nextPageId[0]) < int(lastId):
                 hasEncounteredLastId = True
 
             f.write(parentId + "\n")

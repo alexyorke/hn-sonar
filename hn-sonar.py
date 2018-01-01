@@ -1,7 +1,6 @@
 import re
 from bs4 import BeautifulSoup
-import urllib2
-import urllib
+import urllib.request
 import json
 import sys
 
@@ -18,6 +17,9 @@ try:
         shouldContinue = True
 except IndexError:
     shouldContinue = False
+
+shouldNotifyStory = True
+shouldNotifyComment = True
 
 usedIdsFilePath = "hnSonarUsedIds.txt"
 hnFirebaseAPI = "https://hacker-news.firebaseio.com/v0/"
@@ -36,10 +38,11 @@ hasEncounteredLastId = False
 pageUrl = "https://news.ycombinator.com/newcomments"
 
 # keep going until we find this id (the last id that hn-sonar saw)
-lastId = max(usedIds)
+if (usedIds != []):
+    lastId = max(usedIds)
 
 while True:
-    r = urllib.urlopen(pageUrl).read()
+    r = urllib.request.urlopen(pageUrl).read()
 
     soup = BeautifulSoup(r, "lxml")
     nextPageId = soup.find_all("a", attrs={"class": "morelink"})[0]['href']
@@ -60,22 +63,34 @@ while True:
             if (parentId in usedIds):
                 continue
 
-            if int(nextPageId[0]) < int(lastId):
+            if lastId is None or int(nextPageId[0]) < int(lastId):
                 hasEncounteredLastId = True
 
             f.write(parentId + "\n")
             # check to see if the parent id is a post.
             # if it is not a post, find the username of the parent
             # if the username matches ours, then it is a comment reply
-            post = json.loads(urllib2.urlopen(hnFirebaseAPI + "item/" +
-                              str(parentId) + ".json").read())
-            if (post is not None and post['type'] == 'comment'):
-                postParentData = urllib2.urlopen(hnFirebaseAPI +
-                                                 "item/" + str(post['parent']) +
-                                                 ".json")
-                if (json.loads(postParentData.read())['by'] == hnName):
-                    print("Reply to comment: " +
-                          "https://news.ycombinator.com/item?id=" + str(parentId))
+            post = json.loads(urllib.request.urlopen(hnFirebaseAPI + "item/" +
+                              str(parentId) + ".json").read().decode("utf-8"))
+            if (post is not None):
+                if (post['type'] == 'comment'):
+                    postParentData = urllib.request.urlopen(hnFirebaseAPI +
+                                                     "item/" + str(post['parent']) +
+                                                     ".json").read().decode("utf-8")
+                    postParentData = json.loads(postParentData)
+                    replyToStory = postParentData['type'] == "story"
+                    replyToComment = postParentData['type'] == "comment"
+
+                    replyType = ""
+                    if replyToStory:
+                        replyType = "story"
+                    else:
+                        replyType = "comment"
+
+                    if ((postParentData['by'] == hnName) and ((replyToStory and shouldNotifyStory) or (replyToComment and shouldNotifyComment))):
+                        print("Reply to " + replyType + ": " +
+                              "https://news.ycombinator.com/item?id=" + str(parentId))
+                        
     # if the user ids array is empty, then we should not check for previous comments
     # because it would go through all of the pages forever and forever until the beginning
     # of time, which would be bad.

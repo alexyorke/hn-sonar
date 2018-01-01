@@ -3,30 +3,51 @@ Automatically be notified if someone replies to your comment on Hacker News. No 
 
 [![Updates](https://pyup.io/repos/github/Decagon/hn-sonar/shield.svg)](https://pyup.io/repos/github/Decagon/hn-sonar/) [![Python 3](https://pyup.io/repos/github/Decagon/hn-sonar/python-3-shield.svg)](https://pyup.io/repos/github/Decagon/hn-sonar/)
 
+```
+usage: hn-sonar.py [-h] -u [U] [--nocomments] [--nostory]
+                   [--tmpfile [TMPFILE]]
 
-hn-sonar is a decentralized and self-hosted app which lets you know if someone responds to your HN comment or post. Notifications can be batched in any interval you desire, simply by running hn-sonar whenever you would like to check for new comments. It keeps track of which comments it has already seen, and will catch up by checking older comments to see if those have received new replies, so that you don't miss anything. 
+optional arguments:
+  -h, --help           show this help message and exit
+  -u [U]               your Hacker News username
+  --nocomments         don't notify when you recieve a reply to your comment
+  --nostory            don't notify when you recieve a reply to your story
+  --tmpfile [TMPFILE]  the visited comment ids database file path
+  ```
+ 
+`hn-sonar` is a decentralized and self-hosted app which lets you know if someone responds to your HN comment or post. Notifications can be batched in any interval you desire, simply by running `hn-sonar` whenever you would like to check for new comments. It keeps track of which comments it has already seen, and will catch up by checking older comments to see if those have received new replies, so that you don't miss anything. 
 
 HN-Sonar can...
 
-- be self-hosted so there are no privacy concerns with sharing your email address with another company/website. hn-sonar can still be centralized, and still does not need your email.
+- be self-hosted so there are no privacy concerns with sharing your email address with another company/website. `hn-sonar` can still be centralized, and still does not need your email.
 
-- is able to find the latest replies even if hn-sonar is not running all of the time. Use the `--continue` flag to search through all of the comments that were missed while hn-sonar was not running and check for replies. This allows you to batch replies into a single daily email by running hn-sonar daily. The continue option works even if the last comment that was seen was deleted, and it won't go into an infinite loop.
+- is able to find the latest replies even if `hn-sonar` is not running all of the time.
 
-- be used to detect if the author edited their comment after submission, or deleted it*.
+- allow you to get replies on only stories, comments, or both (default).
 
 
 ## Usage
 
-Requires Python 3 and Beautiful Soup 4.
+Run `hn-sonar` as `while true; do python3 hn-sonar.py -u <your-hn-username> | mail; sleep 1m; done;` in your favorite shell to check every minute and recieve an email when someone responds to your comment. Make sure not to check the comments too frequently as the API could throw a 403 forbidden error, so once every minute or so should be safe.
 
-If you have pip, you can install Beautiful Soup by running `pip install beautifulsoup4`.
+## Roadmap
 
-Grab hn-sonar.py: `wget https://raw.githubusercontent.com/Decagon/hn-sonar/master/hn-sonar.py`
+Some cool features that we'd like to add to `hn-sonar` are:
 
-Run it as `while true; do python hn-sonar.py <your-hn-username> --continue | mail; sleep 1m; done;` to check every minute and recieve an email when someone responds to your comment. Don't worry--the `--continue` flag will keep track of which comments it hasn't seen yet, so feel free to stop or start hn-sonar however often you please.
+- detect if the author edited their comment after submission, or deleted it*.
+
+- don't recieve notifications on comments or stories posted after a certain date (e.g. one week.)
+
+- don't recieve many hundreds of notifications on extremely popular comments or stories.
+
+- whitelisting or blocking notifications based on usernames.
+
+- get notifications when your comment gets a reply and it is in the grey zone (when your comment is downvoted and dimmed.)
+
+- ability to include the original comment and the replied comment into the notification email for context.
 
 ### Example email
 
 Reply to comment: http://news.ycombinator.com/item?id=xyz
 
-*Important:* ensure that the directory where hn-sonar is being run in is writable, as hn-sonar uses a database to know which replies have been emailed.
+*Important:* ensure that the directory where `hn-sonar` is being run in is writable, as `hn-sonar` uses a database to know which replies have been emailed.

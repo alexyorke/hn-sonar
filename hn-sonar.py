@@ -7,7 +7,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-u", nargs="?", help="your Hacker News username")
+parser.add_argument("-u", nargs="?", required=True, help="your Hacker News username")
 
 parser.add_argument("--nocomments", help="don't notify when you recieve a reply to your comment", action="store_true")
 parser.add_argument("--nostory", help="don't notify when you recieve a reply to your story", action="store_true")

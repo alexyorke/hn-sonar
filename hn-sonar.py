@@ -3,25 +3,29 @@ from bs4 import BeautifulSoup
 import urllib.request
 import json
 import sys
+import argparse
 
-try:
-    hnName = sys.argv[1]
-except IndexError:
-    print("Usage: hn-sonar.py <hn-username>")
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-u", nargs="?", help="your Hacker News username")
+
+parser.add_argument("--nocomments", help="don't notify when you recieve a reply to your comment", action="store_true")
+parser.add_argument("--nostory", help="don't notify when you recieve a reply to your story", action="store_true")
+parser.add_argument("--tmpfile", help="the visited comment ids database file path", nargs="?", default="hnSonarUsedIds.txt")
+
+args = parser.parse_args()
+
+shouldNotifyStory = not args.nostory
+shouldNotifyComment = not args.nocomments
+
+# check if both stories and comments are not being enabled
+if not shouldNotifyComment and not shouldNotifyStory:
+    print("Error: conflicting options --nocomments and --nostory")
     sys.exit()
 
-# check if we should check previous pages for comments
-# if hn-sonar was not running for a while
-try:
-    if (sys.argv[2] == "--continue"):
-        shouldContinue = True
-except IndexError:
-    shouldContinue = False
+hnName = args.u
 
-shouldNotifyStory = True
-shouldNotifyComment = True
-
-usedIdsFilePath = "hnSonarUsedIds.txt"
+usedIdsFilePath = args.tmpfile
 hnFirebaseAPI = "https://hacker-news.firebaseio.com/v0/"
 
 # find traversed parent ids so that replies are not printed more than once
@@ -40,11 +44,18 @@ pageUrl = "https://news.ycombinator.com/newcomments"
 # keep going until we find this id (the last id that hn-sonar saw)
 if (usedIds != []):
     lastId = max(usedIds)
+    # don't continue forever since we don't know where to stop
+    shouldContinue = False
+else:
+    # should keep going until we reach an id we have already seen
+    shouldContinue = True
 
 while True:
-    r = urllib.request.urlopen(pageUrl).read()
+    r = urllib.request.urlopen(pageUrl)
+    if (r.getcode() == 403):
+        print("Error: whoa, you are checking comments too quickly! (Recieved 403 Forbidden)")
 
-    soup = BeautifulSoup(r, "lxml")
+    soup = BeautifulSoup(r.read().decode("utf-8"), "lxml")
     nextPageId = soup.find_all("a", attrs={"class": "morelink"})[0]['href']
     nextPageId = re.findall(r'\d+', nextPageId)
 
@@ -90,7 +101,7 @@ while True:
                     if ((postParentData['by'] == hnName) and ((replyToStory and shouldNotifyStory) or (replyToComment and shouldNotifyComment))):
                         print("Reply to " + replyType + ": " +
                               "https://news.ycombinator.com/item?id=" + str(parentId))
-                        
+
     # if the user ids array is empty, then we should not check for previous comments
     # because it would go through all of the pages forever and forever until the beginning
     # of time, which would be bad.
